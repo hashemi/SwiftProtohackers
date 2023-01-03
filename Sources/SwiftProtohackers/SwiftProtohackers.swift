@@ -9,8 +9,10 @@ public struct SwiftProtohackers {
             .serverChannelOption(ChannelOptions.backlog, value: 256)
             .serverChannelOption(ChannelOptions.socketOption(.so_reuseaddr), value: 1)
             .childChannelInitializer { channel in
-                channel.pipeline.addHandlers(BackPressureHandler()).flatMap { v in
-                    channel.pipeline.addHandlers(SmokeTestHandler())
+                channel.pipeline.addHandler(BackPressureHandler()).flatMap { v in
+                    channel.pipeline.addHandler(ByteToMessageHandler(MessagePerLineDecoder())).flatMap { v in
+                        channel.pipeline.addHandler(PrimeTimeHandler())
+                    }
                 }
             }
             .childChannelOption(ChannelOptions.socketOption(.so_reuseaddr), value: 1)
