@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "SwiftProtohackers",
     platforms: [
-        .macOS(.v10_15)
+        .macOS(.v13)
     ],
     dependencies: [
         .package(url: "https://github.com/hashemi/swift-nio.git", branch: "allow-empty-datagrams")
