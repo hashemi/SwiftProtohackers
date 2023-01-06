@@ -4,14 +4,16 @@ import NIOPosix
 @main
 public struct SwiftProtohackers {
     public static func main() throws {
+        let budgetChatHandler = BudgetChatHandler()
+
         let group = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
         let bootstrap = ServerBootstrap(group: group)
             .serverChannelOption(ChannelOptions.backlog, value: 256)
             .serverChannelOption(ChannelOptions.socketOption(.so_reuseaddr), value: 1)
             .childChannelInitializer { channel in
                 channel.pipeline.addHandler(BackPressureHandler()).flatMap { v in
-                    channel.pipeline.addHandler(ByteToMessageHandler(InvestmentBankMessageDecoder())).flatMap { v in
-                        channel.pipeline.addHandler(MeansToAnEndHandler())
+                    channel.pipeline.addHandler(ByteToMessageHandler(MessagePerLineDecoder())).flatMap { v in
+                        channel.pipeline.addHandler(budgetChatHandler)
                     }
                 }
             }
