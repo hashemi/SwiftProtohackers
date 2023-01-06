@@ -4,22 +4,16 @@ import NIOPosix
 @main
 public struct SwiftProtohackers {
     public static func main() throws {
-        let budgetChatHandler = BudgetChatHandler()
+        let unusualDatabaseMessageHandler = UnusualDatabaseMessageHandler()
 
-        let group = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
-        let bootstrap = ServerBootstrap(group: group)
-            .serverChannelOption(ChannelOptions.backlog, value: 256)
-            .serverChannelOption(ChannelOptions.socketOption(.so_reuseaddr), value: 1)
-            .childChannelInitializer { channel in
-                channel.pipeline.addHandler(BackPressureHandler()).flatMap { v in
-                    channel.pipeline.addHandler(ByteToMessageHandler(MessagePerLineDecoder())).flatMap { v in
-                        channel.pipeline.addHandler(budgetChatHandler)
-                    }
+        let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
+        let bootstrap = DatagramBootstrap(group: group)
+            .channelOption(ChannelOptions.socketOption(.so_reuseaddr), value: 1)
+            .channelInitializer { channel in
+                channel.pipeline.addHandler(UnusualDatabaseMessageDecoder()).flatMap { v in
+                    channel.pipeline.addHandler(unusualDatabaseMessageHandler)
                 }
             }
-            .childChannelOption(ChannelOptions.socketOption(.so_reuseaddr), value: 1)
-            .childChannelOption(ChannelOptions.maxMessagesPerRead, value: 16)
-            .childChannelOption(ChannelOptions.recvAllocator, value: AdaptiveRecvByteBufferAllocator())
 
         defer {
             try! group.syncShutdownGracefully()

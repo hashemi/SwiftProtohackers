@@ -9,7 +9,7 @@ let package = Package(
         .macOS(.v10_15)
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-nio.git", from: "2.0.0")
+        .package(url: "https://github.com/hashemi/swift-nio.git", branch: "allow-empty-datagrams")
     ],
     targets: [
         .executableTarget(
