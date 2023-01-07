@@ -21,10 +21,10 @@
     {
       "identity" : "swift-nio",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/hashemi/swift-nio.git",
+      "location" : "https://github.com/apple/swift-nio.git",
       "state" : {
-        "branch" : "allow-empty-datagrams",
-        "revision" : "6acb5ffb3913736d8bfef16801a8790f19da1d79"
+        "branch" : "main",
+        "revision" : "1ce136b4c392bd7427cf408d65305a05d162fb46"
       }
     }
   ],
