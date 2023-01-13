@@ -4,26 +4,14 @@ import NIOPosix
 @main
 public struct SwiftProtohackers {
     public static func main() throws {
-        let dispatchCenter = SpeedDaemonDispatchCenter()
-        let group = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
-        let bootstrap = ServerBootstrap(group: group)
-            .serverChannelOption(ChannelOptions.backlog, value: 256)
-            .serverChannelOption(ChannelOptions.socketOption(.so_reuseaddr), value: 1)
-            .childChannelInitializer { channel in
-                channel.pipeline.addHandler(BackPressureHandler())
-                    .flatMap {
-                        channel.pipeline.addHandler(MessageToByteHandler(SpeedDaemonResponseEncoder()))
-                            .flatMap {
-                                channel.pipeline.addHandler(ByteToMessageHandler(SpeedDaemonRequestDecoder()))
-                                    .flatMap {
-                                        channel.pipeline.addHandler(SpeedDaemonHandler(dispatchCenter: dispatchCenter))
-                                    }
-                            }
-                    }
+        let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
+        let bootstrap = DatagramBootstrap(group: group)
+            .channelOption(ChannelOptions.socketOption(.so_reuseaddr), value: 1)
+            .channelInitializer { channel in
+                channel.pipeline.addHandler(LineReversal.EncoderDecoder()).flatMap {
+                    channel.pipeline.addHandler(LineReversal.LRCPHandler())
+                }
             }
-            .childChannelOption(ChannelOptions.socketOption(.so_reuseaddr), value: 1)
-            .childChannelOption(ChannelOptions.maxMessagesPerRead, value: 16)
-            .childChannelOption(ChannelOptions.recvAllocator, value: AdaptiveRecvByteBufferAllocator())
 
         defer {
             try! group.syncShutdownGracefully()
