@@ -4,6 +4,7 @@ import NIOPosix
 @main
 public struct SwiftProtohackers {
     public static func main() throws {
+        let center = JobCenter.Center()
         let group = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
         let bootstrap = ServerBootstrap(group: group)
             .serverChannelOption(ChannelOptions.backlog, value: 256)
@@ -11,9 +12,9 @@ public struct SwiftProtohackers {
             .childChannelInitializer { channel in
                 channel.pipeline.addHandlers([
                     BackPressureHandler(),
-                    InsecureSocketsLayer.EncryptDecryptHandler(),
-                    ByteToMessageHandler(MessagePerLineDecoder()),
-                    InsecureSocketsLayer.AppHandler(),
+                    ByteToMessageHandler(JobCenter.RequestDecoder()),
+                    MessageToByteHandler(JobCenter.ResponseEncoder()),
+                    JobCenter.Handler(center: center)
                 ])
             }
             .childChannelOption(ChannelOptions.socketOption(.so_reuseaddr), value: 1)
