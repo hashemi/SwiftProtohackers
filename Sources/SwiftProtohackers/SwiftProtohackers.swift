@@ -4,7 +4,7 @@ import NIOPosix
 @main
 public struct SwiftProtohackers {
     public static func main() throws {
-        let root = VoraciousCodeStorage.Folder()
+        let centralControl = PestControl.CentralControl()
         let group = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
         let bootstrap = ServerBootstrap(group: group)
             .serverChannelOption(ChannelOptions.backlog, value: 256)
@@ -12,9 +12,9 @@ public struct SwiftProtohackers {
             .childChannelInitializer { channel in
                 channel.pipeline.addHandlers([
                     BackPressureHandler(),
-                    ByteToMessageHandler(VoraciousCodeStorage.RequestDecoder()),
-                    MessageToByteHandler(VoraciousCodeStorage.ResponseEncoder()),
-                    VoraciousCodeStorage.Handler(root: root),
+                    ByteToMessageHandler(PestControl.Decoder()),
+                    MessageToByteHandler(PestControl.Encoder()),
+                    PestControl.ServerHandler(centralControl: centralControl),
                 ])
             }
             .childChannelOption(ChannelOptions.socketOption(.so_reuseaddr), value: 1)
